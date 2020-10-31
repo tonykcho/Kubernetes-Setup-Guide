@@ -88,6 +88,62 @@ Official Page: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and
 
     kubectl taint node kmaster node-role.kubernetes.io/master:NoSchedule-
 
+# Nginx Ingress
+
+## Install Ingress
+
+Source: https://kubernetes.github.io/ingress-nginx/
+
+> Bare-metal install
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.40.2/deploy/static/provider/baremetal/deploy.yaml
+
+A NodePort service is exposed on every node with 80/assignPort and 443/assignPort
+
+> Create Ingress Resource (Example)
+
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: test-ingress
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      tls:
+      - secretName: demo
+      rules:
+      - http:
+          paths:
+          - path: /demo
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+
+* Remember to Add annotations (rewrite is important)
+
+## Change Default ssl (Optional, I would prefer hosting a nginx and proxy pass to ingress ip)
+
+> Self Signed Sert
+
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./ssl/nginx.key -out ./ssl/nginx.crt
+
+Create TLS Secret
+
+    kubectl create secret tls demo-tls --key ./ssl/nginx.key --cert ./ssl/nginx.crt
+
+Edit Ingress Controller Deployment
+
+    kubectl edit deployment ingress-nginx-controller -n ingress-nginx
+
+Add arg under args 
+
+    - --default-ssl-certificate=default/demo-tls
+
+> Certbot (Need to manually create cert or use nginx to create cert first)
+
 # Kubernetes Dashboard
 
 Official Steps: https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/
@@ -149,6 +205,33 @@ Then you can access on http://localhost:8001/api/v1/namespaces/kubernetes-dashbo
     kubectl edit svc kubernetes-dashboard -n kubernetes-dashboard
 
 Access it on `https://MasterHostIP:DashboardPort`
+
+## Dashboard Ingress
+
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: dashboard
+      namespace: kubernetes-dashboard
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    spec:
+      tls:
+      - secretName: kubernetes-dashboard-certs
+      rules:
+      - http:
+          paths:
+          - path: /dashboard(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 443
+
+* Note: You can access dashboard at /dashboard/ not /dashboard
 
 # Jenkins
 
