@@ -1,11 +1,13 @@
-pipeline {
-  agent any
-  stages {
+node('jenkins-slave') {
     stage('Test') {
-      steps {
-        sh 'echo "Hello World"'
-      }
+      echo "Hello World"
     }
-
+  
+  stage('Test Docker'){
+    sh "docker ps"
+  }
+  
+  stage('Test kubectl'){
+    sh "kubectl get pods"
   }
 }
