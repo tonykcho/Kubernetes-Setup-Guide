@@ -1,5 +1,7 @@
-node('jenkins-slave') {
-    stage('Test') {
-      echo "Hello World"
+podTemplate {
+    node('jenkins-slave') {
+        stage('Run shell') {
+            sh 'echo hello world'
+        }
     }
 }
