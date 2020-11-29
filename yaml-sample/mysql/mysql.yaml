@@ -18,7 +18,7 @@ spec:
         image: mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: Hkc64760575
+          value: PW_PW_PW
         ports:
         - containerPort: 3306
           name: mysql
@@ -28,5 +28,5 @@ spec:
       volumes:
       - name: mysql-volume
         hostPath:
-          path: /home/tony/mysql
+          path: Path
           type: Directory
