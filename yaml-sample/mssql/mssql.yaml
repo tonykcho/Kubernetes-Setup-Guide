@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  name: mssql-db
+spec:
+  selector:
+    matchLabels:
+      app: mssql-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mssql-db
+    spec:
+      containers:
+      - name: mssql-server
+        image: "mcr.microsoft.com/mssql/server"
+        ports:
+        - containerPort: 1433
+        env:
+        - name: SA_PASSWORD
+          value: "Hkc64760575"
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_PID
+          value: Express
+        volumeMounts:
+        - mountPath: /var/opt/mssql/data
+          name: mssql-volume
+      volumes:
+      - name: mssql-volume
+        hostPath:
+          path: /home/tony/mssql
+          type: Directory
