@@ -20,7 +20,7 @@ spec:
         - containerPort: 1433
         env:
         - name: SA_PASSWORD
-          value: "Hkc64760575"
+          value: "YOUR_PW"
         - name: ACCEPT_EULA
           value: "Y"
         - name: MSSQL_PID
@@ -31,5 +31,5 @@ spec:
       volumes:
       - name: mssql-volume
         hostPath:
-          path: /home/tony/mssql
+          path: Path
           type: Directory
